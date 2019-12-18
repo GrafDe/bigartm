@@ -470,12 +470,13 @@ void ProcessorHelpers::InferThetaAndUpdateNwtSparse(const ProcessBatchesArgs& ar
 
         for (int i = begin_index; i < end_index; ++i) {
 
-          float p_dw_val = 0.0f;
+          //float p_dw_val = 0.0f;
           const float* phi_values_ptr = &local_phi_values(i - begin_index, 0);
           const int* phi_ptrs_ptr = &local_phi_ptrs(i - begin_index, 0);
 
           int num_non_zero_topics = num_non_zero_topics_for_token[i - begin_index];
 
+          /*
           if (num_non_zero_topics < num_topics) {
             for (int k = 0; k < num_non_zero_topics; ++k) {
               p_dw_val += phi_values_ptr[k] * theta_ptr[phi_ptrs_ptr[k]];
@@ -488,8 +489,9 @@ void ProcessorHelpers::InferThetaAndUpdateNwtSparse(const ProcessBatchesArgs& ar
           if (isZero(p_dw_val)) {
             continue;
           }
+          */
 
-          const float alpha = sparse_ndw.val()[i] / p_dw_val;
+          const float alpha = sparse_ndw.val()[i]; // / p_dw_val;
           if (num_non_zero_topics < num_topics) {
             for (int k = 0; k < num_non_zero_topics; ++k) {
               ntd_ptr[phi_ptrs_ptr[k]] += alpha * phi_values_ptr[k];
@@ -523,11 +525,14 @@ void ProcessorHelpers::InferThetaAndUpdateNwtSparse(const ProcessBatchesArgs& ar
       for (int d = 0; d < docs_count; ++d) {
         for (int i = sparse_ndw.row_ptr()[d]; i < sparse_ndw.row_ptr()[d + 1]; ++i) {
           int w = sparse_ndw.col_ind()[i];
+
+          /*
           float p_dw_val = blas->sdot(num_topics, &phi_matrix(w, 0), 1, &(*theta_matrix)(0, d), 1);  // NOLINT
           if (isZero(p_dw_val)) {
             continue;
           }
-          blas->saxpy(num_topics, sparse_ndw.val()[i] / p_dw_val, &phi_matrix(w, 0), 1, &helper_td(0, d), 1);
+          */
+          blas->saxpy(num_topics, sparse_ndw.val()[i] /* / p_dw_val */, &phi_matrix(w, 0), 1, &helper_td(0, d), 1);
         }
       }
 
