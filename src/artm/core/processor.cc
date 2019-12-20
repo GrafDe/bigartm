@@ -49,6 +49,7 @@ Processor::~Processor() {
 
 void Processor::ThreadFunction() {
   try {
+    int processed_iterations = 0;
     int total_processed_batches = 0;  // counter
 
     // Do not log performance measurements below kTimeLoggingThreshold milliseconds
@@ -240,10 +241,17 @@ void Processor::ThreadFunction() {
             }
 
             if (ptdw_agents.empty() && !part->has_ptdw_cache_manager()) {
+              bool use_e_step_normalization = false;
+              if (processed_iterations % 2 == 1) {
+                use_e_step_normalization = true;
+              }
+
               CuckooWatch cuckoo2("InferThetaAndUpdateNwtSparse", &cuckoo, kTimeLoggingThreshold);
               ProcessorHelpers::InferThetaAndUpdateNwtSparse(args, batch, part->batch_weight(), *sparse_ndw, p_wt,
                                                              theta_agents, theta_matrix.get(), nwt_writer.get(),
-                                                             blas, new_cache_entry_ptr.get());
+                                                             blas, new_cache_entry_ptr.get(),
+                                                             use_e_step_normalization);
+              ++processed_iterations;
             } else {
               CuckooWatch cuckoo2("InferPtdwAndUpdateNwtSparse", &cuckoo, kTimeLoggingThreshold);
               ProcessorHelpers::InferPtdwAndUpdateNwtSparse(args, batch, part->batch_weight(), *sparse_ndw,

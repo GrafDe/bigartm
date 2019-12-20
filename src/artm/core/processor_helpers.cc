@@ -390,7 +390,8 @@ void ProcessorHelpers::InferThetaAndUpdateNwtSparse(const ProcessBatchesArgs& ar
                                                     LocalThetaMatrix<float>* theta_matrix,
                                                     NwtWriteAdapter* nwt_writer,
                                                     util::Blas* blas,
-                                                    ThetaMatrix* new_cache_entry_ptr) {
+                                                    ThetaMatrix* new_cache_entry_ptr,
+                                                    bool use_e_step_normalization) {
   LocalThetaMatrix<float> n_td(theta_matrix->num_topics(), theta_matrix->num_items());
   const int num_topics = p_wt.topic_size();
   const int docs_count = theta_matrix->num_items();
@@ -470,28 +471,31 @@ void ProcessorHelpers::InferThetaAndUpdateNwtSparse(const ProcessBatchesArgs& ar
 
         for (int i = begin_index; i < end_index; ++i) {
 
-          //float p_dw_val = 0.0f;
+          float p_dw_val = 0.0f;
           const float* phi_values_ptr = &local_phi_values(i - begin_index, 0);
           const int* phi_ptrs_ptr = &local_phi_ptrs(i - begin_index, 0);
 
           int num_non_zero_topics = num_non_zero_topics_for_token[i - begin_index];
 
-          /*
-          if (num_non_zero_topics < num_topics) {
-            for (int k = 0; k < num_non_zero_topics; ++k) {
-              p_dw_val += phi_values_ptr[k] * theta_ptr[phi_ptrs_ptr[k]];
-            }
-          } else {
-            for (int k = 0; k < num_topics; ++k) {
-              p_dw_val += phi_values_ptr[k] * theta_ptr[k];
-            }
-          }
-          if (isZero(p_dw_val)) {
-            continue;
-          }
-          */
+          float alpha = sparse_ndw.val()[i];
 
-          const float alpha = sparse_ndw.val()[i]; // / p_dw_val;
+          if (use_e_step_normalization) {
+            if (num_non_zero_topics < num_topics) {
+              for (int k = 0; k < num_non_zero_topics; ++k) {
+                p_dw_val += phi_values_ptr[k] * theta_ptr[phi_ptrs_ptr[k]];
+              }
+            } else {
+              for (int k = 0; k < num_topics; ++k) {
+                p_dw_val += phi_values_ptr[k] * theta_ptr[k];
+              }
+            }
+            if (isZero(p_dw_val)) {
+              continue;
+            }
+
+            alpha /= p_dw_val;
+          }
+
           if (num_non_zero_topics < num_topics) {
             for (int k = 0; k < num_non_zero_topics; ++k) {
               ntd_ptr[phi_ptrs_ptr[k]] += alpha * phi_values_ptr[k];

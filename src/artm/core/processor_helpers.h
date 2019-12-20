@@ -179,7 +179,8 @@ class ProcessorHelpers {
                                            LocalThetaMatrix<float>* theta_matrix,
                                            NwtWriteAdapter* nwt_writer,
                                            util::Blas* blas,
-                                           ThetaMatrix* new_cache_entry_ptr = nullptr);
+                                           ThetaMatrix* new_cache_entry_ptr = nullptr,
+                                           bool use_e_step_normalization = true);
 
   ProcessorHelpers() = delete;
 };
