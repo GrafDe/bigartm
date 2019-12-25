@@ -457,6 +457,7 @@ Instance::GetPhiMatrixSafe(ModelName model_name) const {
 }
 
 void Instance::SetPhiMatrix(ModelName model_name, std::shared_ptr< ::artm::core::PhiMatrix> phi_matrix) {
+  LOG(ERROR) << "SetPhiMatrix: " << model_name << ", was in: " << models_.has_key(model_name);
   models_.erase(model_name);
   if (phi_matrix != nullptr) {
     models_.set(model_name, phi_matrix);

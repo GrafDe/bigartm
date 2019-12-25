@@ -116,6 +116,7 @@ class MasterComponent : boost::noncopyable {
 
   void AddDictionary(std::shared_ptr<Dictionary> dictionary);
 
+ public:
   std::shared_ptr<Instance> instance_;
 };
 

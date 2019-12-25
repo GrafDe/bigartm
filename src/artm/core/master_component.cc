@@ -1029,6 +1029,9 @@ void MasterComponent::NormalizeModel(const NormalizeModelArgs& normalize_model_a
   } else {
     PhiMatrixOperations::FindPwt(n_wt, *rwt_phi_matrix, pwt_target.get());
   }
+
+
+  LOG(ERROR) << "Update Phi!!!";
   instance_->SetPhiMatrix(pwt_target_name, pwt_target);
   VLOG(0) << "MasterComponent: complete normalizing model " << normalize_model_args.nwt_source_name();
 }
@@ -1297,6 +1300,8 @@ class ArtmExecutor {
       ::artm::core::ScoreManager score_manager(master_component_->instance_.get());
       ProcessBatches(pwt_name_, nwt_name_, iter, &score_manager);
       Regularize(pwt_name_, nwt_name_, rwt_name);
+
+      master_component_->instance_->DisposeModel(pwt_name_);
       Normalize(pwt_name_, nwt_name_, rwt_name);
       StoreScores(&score_manager);
     }
