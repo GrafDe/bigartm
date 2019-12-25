@@ -657,7 +657,7 @@ void MasterComponent::InitializeModel(const InitializeModelArgs& args) {
     new_ttm->increase(token_index, vec);
   }
 
-  PhiMatrixOperations::FindPwt(*new_ttm, new_ttm.get());
+  PhiMatrixOperations::FindPwt(*new_ttm, new_ttm.get(), false);
   instance_->SetPhiMatrix(args.model_name(), new_ttm);
 
   LOG(INFO) << "InitializeModel() created matrix " << new_ttm->model_name()
@@ -1024,6 +1024,9 @@ void MasterComponent::NormalizeModel(const NormalizeModelArgs& normalize_model_a
 
   auto pwt_target(std::make_shared<DensePhiMatrix>(pwt_target_name, n_wt.topic_name()));
   pwt_target->Reshape(n_wt);
+
+  LOG(ERROR) << "Number of dense rows in n_wt: " << n_wt.get_num_dense_rows();
+  
   if (rwt_phi_matrix == nullptr) {
     PhiMatrixOperations::FindPwt(n_wt, pwt_target.get());
   } else {

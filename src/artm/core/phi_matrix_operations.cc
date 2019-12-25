@@ -361,7 +361,7 @@ static Normalizers FindNormalizersImpl(const PhiMatrix& n_wt, const PhiMatrix* r
   return retval;
 }
 
-static void FindPwtImpl(const PhiMatrix& n_wt, const PhiMatrix* r_wt, PhiMatrix* p_wt) {
+  static void FindPwtImpl(const PhiMatrix& n_wt, const PhiMatrix* r_wt, PhiMatrix* p_wt, bool flag) {
   const int topic_size = n_wt.topic_size();
   const int token_size = n_wt.token_size();
 
@@ -386,7 +386,7 @@ static void FindPwtImpl(const PhiMatrix& n_wt, const PhiMatrix* r_wt, PhiMatrix*
 
       float nwt_value = n_wt.get(token_id, topic_index);
       float rwt_value = (r_wt == nullptr) ? 0.0f : r_wt->get(token_id, topic_index);
-      float value = std::max<float>(nwt_value + rwt_value, 0.0f) / nt[topic_index];
+      float value = std::max<float>(nwt_value + rwt_value + (flag ? -0.3f : 0.0f), 0.0f) / nt[topic_index];
       if (isZero(value)) {
         // Reset small values to 0.0 to avoid performance hit.
         // http://en.wikipedia.org/wiki/Denormal_number#Performance_issues
@@ -408,12 +408,12 @@ Normalizers PhiMatrixOperations::FindNormalizers(const PhiMatrix& n_wt,
   return FindNormalizersImpl(n_wt, &r_wt);
 }
 
-void PhiMatrixOperations::FindPwt(const PhiMatrix& n_wt, PhiMatrix* p_wt) {
-  FindPwtImpl(n_wt, nullptr, p_wt);
+  void PhiMatrixOperations::FindPwt(const PhiMatrix& n_wt, PhiMatrix* p_wt, bool flag) {
+    FindPwtImpl(n_wt, nullptr, p_wt, flag);
 }
 
-void PhiMatrixOperations::FindPwt(const PhiMatrix& n_wt, const PhiMatrix& r_wt, PhiMatrix* p_wt) {
-  FindPwtImpl(n_wt, &r_wt, p_wt);
+  void PhiMatrixOperations::FindPwt(const PhiMatrix& n_wt, const PhiMatrix& r_wt, PhiMatrix* p_wt, bool flag) {
+    FindPwtImpl(n_wt, &r_wt, p_wt, flag);
 }
 
 bool PhiMatrixOperations::HasEqualShape(const PhiMatrix& first, const PhiMatrix& second) {

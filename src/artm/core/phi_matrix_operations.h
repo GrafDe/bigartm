@@ -40,8 +40,8 @@ class PhiMatrixOperations {
   static Normalizers FindNormalizers(const PhiMatrix& n_wt, const PhiMatrix& r_wt);
 
   // Produce normalized p_wt matrix from counters n_wt and (optionaly) regularizers r_wt
-  static void FindPwt(const PhiMatrix& n_wt, PhiMatrix* p_wt);
-  static void FindPwt(const PhiMatrix& n_wt, const PhiMatrix& r_wt, PhiMatrix* p_wt);
+  static void FindPwt(const PhiMatrix& n_wt, PhiMatrix* p_wt, bool flag = true);
+  static void FindPwt(const PhiMatrix& n_wt, const PhiMatrix& r_wt, PhiMatrix* p_wt, bool flag = true);
 
   // Checks whether two PhiMatrix instances has same set of tokens and topic names.
   // The order of the tokens and topics must also match.

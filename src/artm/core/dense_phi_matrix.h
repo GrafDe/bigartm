@@ -85,7 +85,7 @@ class PhiMatrixFrame : public PhiMatrix {
 
   PhiMatrixFrame(const PhiMatrixFrame& rhs);
   PhiMatrixFrame& operator=(const PhiMatrixFrame&);
-
+  
  private:
   ModelName model_name_;
   std::vector<std::string> topic_name_;
@@ -150,6 +150,16 @@ class DensePhiMatrix : public PhiMatrixFrame {
   void Reset();
   void Reshape(const PhiMatrix& phi_matrix);
 
+  virtual int get_num_dense_rows() const {
+    int retval = 0;
+    for (const auto& v : values_) {
+      if (!v.is_packed()) {
+        retval += 1;
+      }
+    }
+    return retval;
+  }
+  
  private:
   friend class AttachedPhiMatrix;
   DensePhiMatrix(const DensePhiMatrix& rhs);

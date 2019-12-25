@@ -44,6 +44,8 @@ class PhiMatrix {
   virtual int AddToken(const Token& token) = 0;
 
   virtual std::shared_ptr<PhiMatrix> Duplicate() const = 0;
+
+  virtual int get_num_dense_rows() const { return -1; }
   virtual ~PhiMatrix() { }
 };
 
