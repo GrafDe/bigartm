@@ -76,7 +76,7 @@ void Helpers::SetThreadName(int thread_id, const char* thread_name) {
 
 #endif
 
-std::vector<float> Helpers::GenerateRandomVector(int size, size_t seed) {
+  std::vector<float> Helpers::GenerateRandomVector(int size, size_t seed, bool flag) {
   std::vector<float> retval;
   retval.reserve(size);
 
@@ -84,8 +84,18 @@ std::vector<float> Helpers::GenerateRandomVector(int size, size_t seed) {
   boost::uniform_real<float> u(0.0f, 1.0f);
   boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > gen(rng, u);
 
+  if (flag) {
+    for (int i = 0; i < size; ++i) {
+      retval.push_back(gen());
+    }
+  } else {
   for (int i = 0; i < size; ++i) {
-    retval.push_back(gen());
+    if (gen() > 0.61f) {
+      retval.push_back(gen());
+    } else {
+      retval.push_back(0.0f);
+    }
+  }
   }
 
   float sum = 0.0f;
@@ -99,7 +109,7 @@ std::vector<float> Helpers::GenerateRandomVector(int size, size_t seed) {
   return retval;
 }
 
-std::vector<float> Helpers::GenerateRandomVector(int size, const Token& token, int seed) {
+  std::vector<float> Helpers::GenerateRandomVector(int size, const Token& token, int seed, bool flag) {
   size_t h = 1125899906842597L;  // prime
 
   if (token.class_id != DefaultClass) {
@@ -118,7 +128,7 @@ std::vector<float> Helpers::GenerateRandomVector(int size, const Token& token, i
     h = 31 * h + seed;
   }
 
-  return GenerateRandomVector(size, h);
+  return GenerateRandomVector(size, h, flag);
 }
 
 // Return the filenames of all files that have the specified extension

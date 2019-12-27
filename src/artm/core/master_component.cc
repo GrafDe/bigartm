@@ -600,8 +600,9 @@ void MasterComponent::InitializeModel(const InitializeModelArgs& args) {
 
   std::shared_ptr<PhiMatrix> new_ttm;
   int excluded_tokens = 0;
+  auto dict = instance_->dictionaries()->get(args.dictionary_name());
+  
   if (args.has_dictionary_name()) {
-    auto dict = instance_->dictionaries()->get(args.dictionary_name());
     if (dict == nullptr) {
       std::stringstream ss;
       ss << "Dictionary '" << args.dictionary_name() << "' does not exist";
@@ -651,11 +652,21 @@ void MasterComponent::InitializeModel(const InitializeModelArgs& args) {
     BOOST_THROW_EXCEPTION(InvalidOperation(ss.str()));
   }
 
+  int counter = 0;
   for (int token_index = 0; token_index < new_ttm->token_size(); token_index++) {
     Token token = new_ttm->token(token_index);
-    std::vector<float> vec = Helpers::GenerateRandomVector(new_ttm->topic_size(), token, args.seed());
+
+    auto entry = dict->entry(token);
+    bool is_important = entry->token_tf() > 500;
+    if (is_important) {
+      ++counter;
+    }
+    
+    std::vector<float> vec = Helpers::GenerateRandomVector(new_ttm->topic_size(), token, args.seed(), is_important);
     new_ttm->increase(token_index, vec);
   }
+
+  LOG(ERROR) << "NUM FULL ROWS: " << counter;
 
   PhiMatrixOperations::FindPwt(*new_ttm, new_ttm.get(), false);
   instance_->SetPhiMatrix(args.model_name(), new_ttm);
