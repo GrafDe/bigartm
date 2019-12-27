@@ -657,7 +657,7 @@ void MasterComponent::InitializeModel(const InitializeModelArgs& args) {
     Token token = new_ttm->token(token_index);
 
     auto entry = dict->entry(token);
-    bool is_important = entry->token_tf() > 500;
+    bool is_important = entry->token_tf() > 800;
     if (is_important) {
       ++counter;
     }

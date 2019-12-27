@@ -275,7 +275,7 @@ void PackedValues::pack() {
   }
 
   // pack iff at 60% of elements (or more) are zeros
-  int rate_of_non_zero_elements = 11;  // from 0 (0%) to 10 (100%)
+  int rate_of_non_zero_elements = 8;  // from 0 (0%) to 10 (100%)
   if (num_zeros < (int64_t) (rate_of_non_zero_elements * values_.size() / 10)) {
     return;
   }

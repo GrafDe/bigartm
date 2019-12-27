@@ -90,7 +90,7 @@ void Helpers::SetThreadName(int thread_id, const char* thread_name) {
     }
   } else {
   for (int i = 0; i < size; ++i) {
-    if (gen() > 0.61f) {
+    if (gen() > 0.81f) {
       retval.push_back(gen());
     } else {
       retval.push_back(0.0f);
